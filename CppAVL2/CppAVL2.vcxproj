@@ -156,7 +156,7 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Node.tpp">
-      <FileType>Document</FileType>
+      <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Tree.h" />
   </ItemGroup>

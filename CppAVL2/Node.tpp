@@ -32,11 +32,7 @@ int Node<T>::GetBalance()
 }
 
 template<typename T>
-void Node<T>::SetChild(std::unique_ptr<Node<T>> child)
+void Node<T>::GetChild(Node<T>* child)
 {
-	if (child->parent == LeftNode.get())
-	{
-		LeftNode = std::move(child);
-	}
-	RightNode = std::move(child);
+	if(LeftNode)
 }
