@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <memory>
 #include <string>
 #include "Node.h"
@@ -13,7 +14,7 @@ public:
 
 	bool Insert(T);
 	void Delete(T);
-	std::string InOrder();
+	void InOrder();
 
 private:
 	int currentHeight;
@@ -21,22 +22,25 @@ private:
 	void rotateLeft(Node<T>* middleNode);
 	void rotateRight(Node<T>* middleNode);
 	bool insert(T, Node<T>* top);
-	void balanceTree(Node<T> currentNode);
-	void search(T key, Node<T> currentNode);
-	std::string inOrder();
+	bool InsertRec(T val);
+	std::unique_ptr<Node<T>> RecursiveInsert(std::unique_ptr<Node<T>> root, T val);
+
+	void balanceTree(Node<T>* currentNode);
+	Node<T>* search(T key, Node<T>* currentNode);
+	void inOrder(Node<T>* currentNode);
 	std::string output;
 };
 
 template <typename T>
 Tree<T>::Tree()
 {
-	head = nullptr;
+	head.reset();
 }
 
 template<typename T>
 Tree<T>::~Tree()
 {
-	head = nullptr;
+	head.reset();
 }
 
 template<typename T>
@@ -92,7 +96,15 @@ void Tree<T>::rotateLeft(Node<T>* middleNode)
 template<typename T>
 bool Tree<T>::Insert(T item)
 {
-	insert(item, head.get());
+	return insert(item, head.get());
+}
+
+template<typename T>
+void Tree<T>::Delete(T key)
+{
+	Node<T>* foundNode = search(key, head.get());
+	foundNode->parent->RemoveChild(foundNode);
+	balanceTree(head.get());
 }
 
 template<typename T>
@@ -102,7 +114,7 @@ bool Tree<T>::insert(T item, Node<T>* currentNode)
 	{
 		if (!head)
 		{
-			head = std::make_unique<Node<T>>(new Node<T>(item, nullptr)); 	
+			head = std::make_unique<Node<T>>(item, nullptr); 	
 			return false;
 		}
 		currentHeight = 1;
@@ -112,7 +124,7 @@ bool Tree<T>::insert(T item, Node<T>* currentNode)
 	{
 		if (insert(item, currentNode->LeftNode.get()))
 		{
-			currentNode->LeftNode = std::make_unique<Node<T>>(new Node<T>(item, nullptr));
+			currentNode->LeftNode = std::make_unique<Node<T>>(item, nullptr);
 			currentNode->LeftNode->parent = currentNode;
 		}
 	}
@@ -120,7 +132,7 @@ bool Tree<T>::insert(T item, Node<T>* currentNode)
 	{
 		if (insert(item, currentNode->RightNode.get()))
 		{
-			currentNode->RightNode = std::make_unique<Node<T>>(new Node<T>(item, nullptr));
+			currentNode->RightNode = std::make_unique<Node<T>>(item, nullptr);
 			currentNode->RightNode->parent = currentNode;
 		}
 	}
@@ -138,14 +150,81 @@ bool Tree<T>::insert(T item, Node<T>* currentNode)
 	return false;
 }
 
-std::string Tree<T> inOrder(TreeNode<T> currentNode)
+template<typename T>
+ bool Tree<T>::InsertRec(T val)
 {
-	
-	if (currentNode == null)
+	 if (!head)
+	 {
+		 Count++;
+		 head = std::make_unique<Node<T>>(val);
+		 return true;
+	}
+	 else
+	 {
+		 head = RecursiveInsert(std::move(head), val);
+	 }
+}
+
+
+template<typename T>
+void Tree<T>::InOrder()
+{
+	 inOrder(head.get());
+}
+
+template<typename T>
+void Tree<T>::balanceTree(Node<T>* currentNode)
+{
+	if (!currentNode)
 	{
 		return;
 	}
-	inOrder(currentNode.LeftNode);
+
+	balanceTree(currentNode->LeftNode.get());
+	balanceTree(currentNode->RightNode.get());
+
+	currentNode->Height = ++currentHeight;
+	if (currentNode->GetBalance() > 1)
+	{
+		rotateLeft(currentNode->RightNode.get());
+	}
+	else if (currentNode->GetBalance() < -1)
+	{
+		rotateRight(currentNode->LeftNode.get());
+	}
+}
+
+template<typename T>
+Node<T>* Tree<T>::search(T key, Node<T>* currentNode)
+{
+	if (!currentNode)
+	{
+		return nullptr;
+	}
+
+	if (currentNode->Item > key)
+	{
+		return search(key, currentNode->LeftNode.get());
+	}
+	else if (currentNode->Item != key)
+	{
+		return search(key, currentNode->RightNode.get());
+	}
+	else
+	{
+		return currentNode;
+	}
+}
+
+template<typename T>
+void Tree<T>::inOrder(Node<T>* currentNode)
+{
 	
-	inOrder(currentNode.RightNode);
+	if (currentNode == nullptr)
+	{
+		return;
+	}
+	inOrder(currentNode->LeftNode.get());
+	std::cout << currentNode->Item;
+	inOrder(currentNode->RightNode.get());
 }

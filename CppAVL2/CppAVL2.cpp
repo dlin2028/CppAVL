@@ -2,10 +2,36 @@
 //
 
 #include <iostream>
+#include "Tree.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	Tree<int>* tree = new Tree<int>();
+
+	while (true)
+	{
+		std::cout << "Operation: (1 insert, 2 delete, 3  print)" << std::endl;
+
+		int operation;
+		int argument;
+		std::cin >> operation;
+
+		switch (operation) {
+		case 1:
+			std::cout << "Argument: " << std::endl;
+			std::cin >> argument;
+			tree->Insert(argument);
+			break;
+		case 2:
+			std::cout << "Argument: " << std::endl;
+			std::cin >> argument;
+			tree->Delete(argument);
+			break;
+		case 3:
+			tree->InOrder();
+			break;
+		}
+	}
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
